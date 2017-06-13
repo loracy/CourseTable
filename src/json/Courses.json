@@ -1,0 +1,65 @@
+[
+   {
+      "courseName": "網際網路概論",
+      "description": "大二必修",
+      "teacher": "林仁智",
+      "day": "三",
+      "startTime": "09:10",
+      "endTime": "12:00",
+      "class": "E403"
+   },
+   {
+      "courseName": "行動程式設計",
+      "description": "大二選修",
+      "teacher": "俞齊山",
+      "day": "二",
+      "startTime": "09:10",
+      "endTime": "12:00",
+      "class": "B403"
+   },
+   {
+      "courseName": "離散數學",
+      "description": "大二選修",
+      "teacher": "洪茂盛",
+      "day": "五",
+      "startTime": "09:10",
+      "endTime": "12:00",
+      "class": "Y201"
+   },
+   {
+      "courseName": "計算機概論",
+      "description": "大一必修",
+      "teacher": "林仁智",
+      "day": "四",
+      "startTime": "09:10",
+      "endTime": "12:00",
+      "class": "Y803"
+   },
+   {
+      "courseName": "微積分(上)",
+      "description": "大一必修",
+      "teacher": "王富祥",
+      "day": "五",
+      "startTime": "13:30",
+      "endTime": "16:40",
+      "class": "E403"
+   },
+   {
+      "courseName": "素描",
+      "description": "大一必修",
+      "teacher": "許一珍",
+      "day": "四",
+      "startTime": "13:30",
+      "endTime": "16:40",
+      "class": "B203"
+   },
+   {
+      "courseName": "程式設計",
+      "description": "大一必修",
+      "teacher": "王學武",
+      "day": "三",
+      "startTime": "13:30",
+      "endTime": "16:40",
+      "class": "F505"
+   }
+]
