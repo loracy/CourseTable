@@ -1,139 +1,67 @@
 import React, { Component } from 'react';
-import { View, TextInput, ActivityIndicator, AsyncStorage, Picker, StatusBar } from 'react-native';
+import { View, Picker, ActivityIndicator, StatusBar, TextInput } from 'react-native';
 import * as firebase from 'firebase';
+// import { FormLabel, FormInput, Button, CheckBox } from 'react-native-elements';
 import { Icon, FormLabel, FormInput, FormValidationMessage, Button, Text } from 'react-native-elements';
-import { Facebook } from 'expo';
 import ModalPicker from 'react-native-modal-picker';
 
 // Make a component
-class Signup extends Component {
+class SettingScreen extends Component {
+    // static navigationOptions = ({ navigation, screenProps }) => ({
+    //     title: '更新會員資料',
+    //     style: ({ backgroundColor: '#a6e0d7' }),
+    //     headerRight: <Button title='儲存' onPress={this.props.navigation.navigate('Account')}/>,
+    // });
+
   state = {
-    email: null,
-    password: null,
     username: null,
-    school: '',
-    department: '',    
-    course: '',
-    error: ' ',
-    loading: false,
-    saving: false,
-    showSpinner: false,
-    token: null,
-    status: 'Not Login...',
-    
+    email: null,
+    school: null,
+    department: null,
+    saving: false
   };
 
-  facebookLogin = async () => {
-    console.log('Testing token....');
-    let token = await AsyncStorage.getItem('fb_token');
-
-    if (token) {
-      console.log('Already having a token...');
-      this.setState({ token });
-
-      const response = await fetch(
-        `https://graph.facebook.com/me?access_token=${token}`);
-      this.setState({ status: `Hello ${(await response.json()).name}` });
-      console.log(response);
-
-    } else {
-      console.log('DO NOT having a token...');
-      this.doFacebookLogin();
-    }
-  };
-
-  doFacebookLogin = async () => {
-    let { type, token } = await Facebook.logInWithReadPermissionsAsync(
-      '1184175101694797',
-      {
-        permissions: ['public_profile'],
-        behavior: 'web'
-      });
-
-    if (type === 'cancel') {
-      console.log('Login Fail!!');
-      return;
-    }
-
-    await AsyncStorage.setItem('fb_token', token);
-    this.setState({ token });
-    const response = await fetch(
-      `https://graph.facebook.com/me?access_token=${token}`);
-    this.setState({ status: `Hello ${(await response.json()).name}` });
-    console.log(response);
-    const credential = firebase.auth.FacebookAuthProvider.credential(token);
-
-    // Sign in with credential from the Facebook user.
-    try {
-      await firebase.auth().signInWithCredential(credential);
-      const { currentUser } = await firebase.auth();
-      console.log(`currentUser = ${currentUser.uid}`);
-      this.props.navigation.navigate('Home');
-    } catch (err) {
-
-    }
-  };
-
-  onSaveInfo = async () => {
-    
+  async componentWillMount() {
     const { currentUser } = firebase.auth();
-    const { email, username, school, department, course } = this.state;
     let dbUserid = firebase.database().ref(`/users/${currentUser.uid}`);
-    await dbUserid.set({  username, email, school, department, course });
+    try {
+      let snapshot = await dbUserid.once('value');
+      let username = snapshot.val().username;
+      let email = snapshot.val().email;
+      let school = snapshot.val().school;
+      let department = snapshot.val().department;
 
-    console.log('check the saving funcrtion~~~~~~~~');
+      this.setState({ username, email, school, department });
+    } catch (err) { }
   }
 
-  onCreateUser = async () => {
-    const { email, password } = this.state;
+  onSaveInfo = async () => {
     this.setState({ saving: true });
-    try {
-
-      await firebase.auth().createUserWithEmailAndPassword(email, password);
-      const { currentUser } = firebase.auth();
-      let dbUserid = firebase.database().ref(`/users/${currentUser.uid}`);
-      await dbUserid.set({  username: "", email: "", school: "", department: "", course: "", });
-      
-      try{ 
-        this.onSaveInfo();
-      } catch (err){
-        console.log('saving fail!!!!!!!!!!!');
-      }
-      this.setState({ saving: false });
-      this.props.navigation.navigate('Home');
-    } catch (err) {
-      this.setState({
-        email: '',
-        password: '',
-        username: null,        
-        error: err.message,
-        loading: false,
-        showModal: false
-      });
-    }
+    const { currentUser } = firebase.auth();
+    const { username, email, school, department } = this.state;
+    let dbUserid = firebase.database().ref(`/users/${currentUser.uid}`);
+    await dbUserid.update({ username, email, school, department });
+    this.setState({ saving: false });
+    this.props.navigation.navigate('Account');
   }
 
   renderButton() {
     if (this.state.saving) {
-      return <ActivityIndicator size='small' />;
+      return <ActivityIndicator size='large' />;
     }
 
     return (
       <Button
-        title='Sign up'
+        style={{ marginTop: 25 }}
+        title='確定更新'
+        onPress={this.onSaveInfo}
         backgroundColor='#4AAF4C'
-        onPress={this.onCreateUser}
-        style={styles.signupBtn}
       />
     );
   }
 
-  async componentDidMount() {
-    await AsyncStorage.removeItem('fb_token');
-  }
-
   render() {
-    let index = 0;
+      let index = 0;
         const schoolData = [
             // { key: index++, section: true, label: 'Fruits' },
             { key: index++, label: '國立台灣大學' },
@@ -162,12 +90,10 @@ class Signup extends Component {
             // { key: index++, section: true, label: 'Vegetables' },
             { key: index++, label: '教育與經營管理學系' },
         ];
- 
     console.log(this.state);
     return (
-      <View style={styles.signupLayout}>
-  
-        <View style={styles.formStyle}>
+      <View style={styles.formStyle}>
+        <StatusBar barStyle='light-content' />        
           <FormLabel labelStyle={styles.formLabel}>姓名</FormLabel>
           <FormInput
             containerStyle={styles.formBorder}
@@ -187,17 +113,6 @@ class Signup extends Component {
             keyboardType='email-address'
             value={this.state.email}
             onChangeText={email => this.setState({ email })}
-          />
-          <FormLabel labelStyle={styles.formLabel}>密碼</FormLabel>
-          <FormInput
-            containerStyle={styles.formBorder}
-            inputStyle={styles.formInput}
-            secureTextEntry
-            autoCorrect={false}
-            autoCapitalize='none'
-            placeholder='password'
-            value={this.state.password}
-            onChangeText={password => this.setState({ password })}
           />
           <FormLabel labelStyle={styles.formLabel}>學校</FormLabel>
           <ModalPicker
@@ -236,28 +151,20 @@ class Signup extends Component {
                 style={styles.dropDownIcon}
               />     
           </ModalPicker>    
-          {this.renderButton()}
-          <FormValidationMessage>{this.state.error}</FormValidationMessage>
-        </View>
-        <View style={styles.formStyle}>
-          <Button
-            title='Sign up with Facebook'
-            backgroundColor='#39579A'
-            onPress={this.facebookLogin}
-            style={{ marginTop: -60 }}
-          />
-        </View>
+  
+        {this.renderButton()}
       </View>
     );
   }
 }
+
 
 const styles = {
   signupLayout: {
     // backgroundColor:'#a6e0d750',
   },
   formStyle: {
-    marginTop: 50,
+    marginTop: 20,
     // flex: 1,
   },
   formLabel: {
@@ -292,7 +199,7 @@ const styles = {
   },
   dropDownIcon: {
     position: 'absolute',
-    backgroundColor:'red',
+    // backgroundColor:'red',
     top: 13,
     right: 5,
     // alignSelf:'center',
@@ -303,4 +210,5 @@ const styles = {
   }
 };
 
-export default Signup;
+
+export default SettingScreen;

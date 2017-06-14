@@ -112,7 +112,7 @@ class LoginScreen extends Component {
 
   renderButton() {
     if (this.state.loading) {
-      return <ActivityIndicator size='large' style={{ marginTop: 30 }} />;
+      return <ActivityIndicator size='small' style={{ marginTop: 30 }} />;
     }
 
     return (

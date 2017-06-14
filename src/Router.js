@@ -11,6 +11,7 @@ import CourseScreen from './Course';
 import AccountScreen from './Account';
 import LoginScreen from './Login';
 import SignupScreen from './Signup';
+import AccountEditScreen from './AccountEdit';
 
 // export const LoginStack = StackNavigator(
 //   {
@@ -134,15 +135,29 @@ export const AccountStack = StackNavigator({
           <Icon
             name='mode-edit' 
             iconStyle={{ marginRight: 10 }}
+            onPress={() => navigate('AccountEdit')}
           />
         ),
         style: ({ backgroundColor: '#a6e0d7' }),
       })
     },
   },
-  HomeStack: {
-    screen: HomeStack,
-  }
+  AccountEdit: {
+    screen: AccountEditScreen,
+    navigationOptions: {
+      header: ({ navigate }) => ({
+        title: '更新會員資料',
+        // right: (
+        //   <Icon
+        //     name='mode-edit' 
+        //     iconStyle={{ marginRight: 10 }}
+        //     onPress={() => navigate('AccountEdit')}
+        //   />
+        // ),
+        style: ({ backgroundColor: '#a6e0d7' }),
+      })
+    },
+  },
 },
 {
   // headerMode: 'none',

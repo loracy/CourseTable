@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Icon, Button } from 'react-native-elements';
+import * as firebase from 'firebase';
 // import { StackNavigator } from 'react-navigation';
 import { DrawerNavigator, TabNavigator, StackNavigator, DrawerView } from 'react-navigation';
 
@@ -11,6 +12,40 @@ import AddScreen from './Add';
 
 
 class HomeSreen extends React.Component {
+  state = { 
+    courses: [],
+    name: null,
+    description: null,
+    teacher: null,
+    day: null,
+    startTime: null,
+    endTime: null,
+    class: null,
+    
+   };
+  
+  componentDidMount() {
+    this.setUserInfo();
+  }
+
+  setUserInfo = async () => {
+    const { currentUser } = firebase.auth();
+    let dbUseridCourse = firebase.database().ref(`/users/${currentUser.uid}`)
+    try {
+      let snapshot = await dbUserid.once('value');
+      // let class = snapshot.val().child('網際網路概論').class;
+      // let Femail = snapshot.val().email;
+      let Fclass = snapshot.val().email;
+      // let Fdepartment = snapshot.val().department;
+      console.log('trying to get the info from firebase........')
+      this.setState({ class: Fclass });
+      console.log('setting the new state...............')
+    } catch (err) { 
+      console.log('cant see the info...........')
+    }
+
+  }
+
   render() {
     const { navigate } = this.props.navigation;
     const { goBack } = this.props.navigation;
@@ -101,7 +136,7 @@ class HomeSreen extends React.Component {
              fontSize={14}
             />
             <Button 
-              title='C634'
+              title='class'
               backgroundColor='#0a8ac4'
               buttonStyle={{ position: 'absolute', bottom: 0, width: 65, height: 25, marginLeft: 0, padding: 3 }}
               fontSize={14}
